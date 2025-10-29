@@ -32,8 +32,21 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    // 🟢 NEW FIELD for Cloudinary image
+    profileImage: {
+      type: String, // Cloudinary image URL
+      default: "",  // will be filled after upload
+    },
+
+    // (Optional) Cloudinary public_id — useful if you plan to delete/replace old images
+    imagePublicId: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
 
 export default mongoose.model("User", userSchema);
+

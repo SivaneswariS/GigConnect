@@ -7,13 +7,15 @@ export const createGig = async (req, res) => {
       return res.status(403).json({ message: "Only clients can post gigs" });
     }
 
-    const { title, description, budget, location } = req.body;
+    const { title, description, budget, location, category, skills } = req.body;
 
     const gig = await Gig.create({
       title,
       description,
       budget,
       location,
+      category,
+      skills,
       client: req.user._id,
     });
 
@@ -23,10 +25,31 @@ export const createGig = async (req, res) => {
   }
 };
 
-// ✅ Get all gigs
+// ✅ Get all gigs (with search + filter)
 export const getAllGigs = async (req, res) => {
   try {
-    const gigs = await Gig.find().populate("client", "name email");
+    const { search, minBudget, maxBudget, category, skill, location } = req.query;
+
+    const query = {};
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (minBudget || maxBudget) {
+      query.budget = {};
+      if (minBudget) query.budget.$gte = Number(minBudget);
+      if (maxBudget) query.budget.$lte = Number(maxBudget);
+    }
+
+    if (category) query.category = category;
+    if (skill) query.skills = { $in: [skill] };
+    if (location) query.location = { $regex: location, $options: "i" };
+
+    const gigs = await Gig.find(query).populate("client", "name email");
     res.json(gigs);
   } catch (error) {
     res.status(500).json({ message: error.message });
