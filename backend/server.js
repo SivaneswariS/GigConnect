@@ -12,6 +12,9 @@ import chatRoutes from "./routes/chatRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
+// ✅ FIXED — Import CommonJS export properly
+import adminRoutes from "./routes/adminRoutes.js";
+
 dotenv.config();
 connectDB();
 
@@ -22,7 +25,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:5173"],
-    methods: ["GET", "POST","PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
@@ -35,6 +38,9 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/payments", paymentRoutes);
 
+// ✅ Admin routes
+app.use("/api/admin", adminRoutes);
+
 app.get("/", (req, res) => res.send("API is running..."));
 
 // ✅ Create HTTP + Socket.IO server
@@ -46,7 +52,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket", "polling"], // important fallback
+  transports: ["websocket", "polling"],
 });
 
 const onlineUsers = new Map();
@@ -62,7 +68,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendMessage", ({ senderId, receiverId, content }) => {
     console.log(`Message from ${senderId} to ${receiverId}: ${content}`);
-    io.to(receiverId).emit("receiveMessage", { senderId,receiverId, content });
+    io.to(receiverId).emit("receiveMessage", { senderId, receiverId, content });
   });
 
   socket.on("disconnect", () => {
@@ -76,9 +82,7 @@ io.on("connection", (socket) => {
 console.log("🟢 Socket.IO server initialized");
 
 const PORT = process.env.PORT || 5050;
-server.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-
-
-
+server.listen(PORT, () =>
+  console.log(`✅ Server running on port ${PORT}`)
+);
 

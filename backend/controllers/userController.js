@@ -7,6 +7,10 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -24,7 +28,6 @@ export const registerUser = async (req, res) => {
       role,
     });
 
-    // Send response
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -33,14 +36,19 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Register Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// ✅ Login User
+// ✅ Login User (Admin + Client + Freelancer)
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Please fill all fields" });
+    }
 
     // Find user
     const user = await User.findOne({ email });
@@ -54,7 +62,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Send response
+    // Login success
     res.json({
       _id: user._id,
       name: user.name,
@@ -63,7 +71,8 @@ export const loginUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Login Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -71,10 +80,12 @@ export const loginUser = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("GetMe Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
-

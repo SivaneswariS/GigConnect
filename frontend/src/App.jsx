@@ -11,6 +11,11 @@ import GigForm from "./components/GigForm";
 import GigFeed from "./components/GigFeed";
 import Chat from "./components/Chat";
 import ChatList from "./components/ChatList";
+import PaymentPage from "./components/PaymentPage";
+import AdminLogin from "./admin/AdminLogin";
+import AdminDashboard from "./admin/AdminDashboard";
+import AdminProtected from "./admin/AdminProtected";
+
 
 // ✅ ProtectedRoute (redirects to login if no token)
 function ProtectedRoute({ children }) {
@@ -167,6 +172,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/pay/:gigId" element={<PaymentPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+<Route
+  path="/admin/dashboard"
+  element={
+    <AdminProtected>
+      <AdminDashboard />
+    </AdminProtected>
+  }
+/>
+
       </Routes>
     </BrowserRouter>
   );
