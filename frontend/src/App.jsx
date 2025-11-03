@@ -1,9 +1,17 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode"; // ✅ Correct import
+import { jwtDecode } from "jwt-decode";
 import socket from "./services/socket";
 
+// User Components
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
@@ -12,24 +20,29 @@ import GigFeed from "./components/GigFeed";
 import Chat from "./components/Chat";
 import ChatList from "./components/ChatList";
 import PaymentPage from "./components/PaymentPage";
+
+// Admin Components
 import AdminLogin from "./admin/AdminLogin";
+import AdminLayout from "./admin/AdminLayout";
 import AdminDashboard from "./admin/AdminDashboard";
+import AdminUsers from "./admin/AdminUsers";
+import AdminGigs from "./admin/AdminGigs";
 import AdminProtected from "./admin/AdminProtected";
 
-
-// ✅ ProtectedRoute (redirects to login if no token)
+// ✅ Protected Route for normal users
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Please log in first!");
-    return <Navigate to="/" replace />;
-  }
+  if (!token) return <Navigate to="/" replace />;
   return children;
 }
 
-// ✅ Navbar with dynamic links + logout
+// ✅ Normal Navbar (hidden on admin pages)
 function Navbar({ isLoggedIn, setIsLoggedIn }) {
   const navigate = useNavigate();
+  const isAdminPage = window.location.pathname.startsWith("/admin");
+
+  // ✅ Hide navbar entirely for admin
+  if (isAdminPage) return null;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -93,25 +106,27 @@ function Navbar({ isLoggedIn, setIsLoggedIn }) {
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
 
   const token = localStorage.getItem("token");
   const currentUserId = token ? jwtDecode(token).id : null;
 
+  // ✅ Socket Connection Logs
   useEffect(() => {
     console.log("Attempting socket connection...");
 
     socket.on("connect", () => {
-      console.log("✅ Connected to Socket.IO server!");
-      console.log("Socket ID:", socket.id);
+      console.log("✅ Connected:", socket.id);
     });
 
     socket.on("disconnect", (reason) => {
-      console.log("❌ Disconnected from Socket.IO:", reason);
+      console.log("❌ Disconnected:", reason);
     });
 
     socket.on("connect_error", (err) => {
-      console.error("🚨 Connection error:", err.message);
+      console.error("🚨 Socket Error:", err.message);
     });
 
     return () => {
@@ -124,14 +139,16 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+
       <Routes>
-        {/* Public Routes */}
+        {/* ✅ Public Routes */}
         <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route
+          path="/register"
+          element={<Register setIsLoggedIn={setIsLoggedIn} />}
+        />
 
-        <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
-
-
-        {/* ✅ Protected Routes */}
+        {/* ✅ User Routes */}
         <Route
           path="/profile"
           element={
@@ -140,6 +157,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/post-gig"
           element={
@@ -148,6 +166,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/gigs"
           element={
@@ -156,6 +175,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/chats"
           element={
@@ -164,6 +184,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/chat/:receiverId"
           element={
@@ -172,24 +193,30 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route path="/pay/:gigId" element={<PaymentPage />} />
+
+        {/* ✅ Admin Login */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-<Route
-  path="/admin/dashboard"
-  element={
-    <AdminProtected>
-      <AdminDashboard />
-    </AdminProtected>
-  }
-/>
-
+        {/* ✅ Admin Layout Routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminProtected>
+              <AdminLayout />
+            </AdminProtected>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="gigs" element={<AdminGigs />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-
 
 
