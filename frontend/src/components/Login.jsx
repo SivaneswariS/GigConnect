@@ -1,75 +1,51 @@
+// components/Login.jsx
 import { useState } from "react";
+import API from "../services/api";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-function Login({ setIsLoggedIn }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Login({ setIsLoggedIn }) {
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
     try {
-      const { data } = await axios.post("http://localhost:5050/api/users/login", {
-        email,
-        password,
-      });
-
-      if (data?.token) {
-        localStorage.setItem("token", data.token);
-        setIsLoggedIn(true);
-        alert("✅ Login successful!");
-        navigate("/profile"); // 🔹 Redirect immediately to profile
-      }
+      const { data } = await API.post("/users/login", form);
+      localStorage.setItem("token", data.token);
+      setIsLoggedIn?.(true);
+      navigate("/profile");
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "3rem auto" }}>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px" }}
-          />
-        </div>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px" }}
-          />
-        </div>
-        <button
-          type="submit"
-          style={{
-            backgroundColor: "#007bff",
-            color: "white",
-            padding: "10px 15px",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: "4px",
-          }}
-        >
+    <div className="max-w-md mx-auto mt-12 bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800">
+      <h2 className="text-2xl font-bold text-cyan-300 mb-4 text-center">Welcome back</h2>
+      {error && <p className="text-red-400 mb-3">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full px-4 py-3 rounded bg-gray-800 border border-gray-700"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full px-4 py-3 rounded bg-gray-800 border border-gray-700"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+        />
+        <button className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold py-3 rounded">
           Login
         </button>
       </form>
     </div>
   );
 }
-
-export default Login;

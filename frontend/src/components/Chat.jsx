@@ -1,131 +1,79 @@
-// src/components/Chat.jsx
-import { useState, useEffect } from "react";
+// components/Chat.jsx
+import { useState, useEffect, useRef } from "react";
 import socket from "../services/socket";
-import axios from "axios";
+import API from "../services/api";
 
 function Chat({ currentUserId, receiverId }) {
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState("");
+  const boxRef = useRef();
 
-  // ✅ 1️⃣ Join socket room when component mounts
   useEffect(() => {
-    if (currentUserId) {
-      console.log("Joining room:", currentUserId);
-      socket.emit("join", currentUserId);
-    }
+    if (!currentUserId) return;
+    socket.emit("join", currentUserId);
 
-    // ✅ Listen for real-time messages
     socket.on("receiveMessage", (msg) => {
-      console.log("📩 Received message:", msg);
-      setMessages((prev) => [...prev, msg]);
+      setMessages((p) => [...p, msg]);
     });
 
-    // ✅ Clean up listeners on unmount
     return () => {
       socket.off("receiveMessage");
     };
   }, [currentUserId]);
 
-  // ✅ 2️⃣ Fetch previous messages from backend
   useEffect(() => {
     const fetchMessages = async () => {
+      if (!receiverId) return;
       try {
-        const res = await axios.get(`http://localhost:5050/api/chat/${receiverId}`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        setMessages(res.data);
+        const { data } = await API.get(`/chat/${receiverId}`);
+        setMessages(data);
       } catch (err) {
-        console.error("Error fetching messages:", err);
+        console.error(err);
       }
     };
-
-    if (receiverId) fetchMessages();
+    fetchMessages();
   }, [receiverId]);
 
-  // ✅ 3️⃣ Send message (Socket + DB)
+  useEffect(() => {
+    boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!content.trim()) return;
-
-    const message = { senderId: currentUserId, receiverId, content };
-
-    // Send through socket for real-time delivery
-    socket.emit("sendMessage", message);
-    setMessages((prev) => [...prev, message]);
+    const msg = { senderId: currentUserId, receiverId, content };
+    socket.emit("sendMessage", msg);
+    setMessages((p) => [...p, msg]);
     setContent("");
-
-    // Also persist in DB
     try {
-      await axios.post(
-        "http://localhost:5050/api/chat",
-        { receiverId, content },
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await API.post("/chat", { receiverId, content });
     } catch (err) {
-      console.error("Error saving message:", err);
+      console.error("save failed", err);
     }
   };
 
-  // ✅ 4️⃣ UI
   return (
-    <div style={{ padding: "1rem", border: "1px solid #ccc", width: "400px" }}>
-      <h3>💬 Chat with {receiverId}</h3>
+    <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 w-full max-w-2xl">
+      <h3 className="text-cyan-300 font-bold mb-3">Chat</h3>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          height: "250px",
-          overflowY: "auto",
-          marginBottom: "1rem",
-          padding: "0.5rem",
-          background: "#fafafa",
-        }}
-      >
-        {messages.map((msg, idx) => {
-          const sender =
-            msg.sender?._id || msg.senderId || msg.sender; // handle both DB and live message formats
+      <div ref={boxRef} className="h-64 overflow-y-auto p-3 space-y-2 bg-gray-800 rounded">
+        {messages.map((m, i) => {
+          const sender = m.sender?._id || m.senderId || m.sender;
+          const mine = sender === currentUserId;
           return (
-            <div
-              key={idx}
-              style={{
-                textAlign: sender === currentUserId ? "right" : "left",
-              }}
-            >
-              <p
-                style={{
-                  background: sender === currentUserId ? "#007bff" : "#eee",
-                  color: sender === currentUserId ? "#fff" : "#000",
-                  display: "inline-block",
-                  padding: "8px 12px",
-                  borderRadius: "15px",
-                  margin: "4px 0",
-                }}
-              >
-                {msg.content}
-              </p>
+            <div key={i} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[70%] px-3 py-2 rounded-lg ${mine ? "bg-cyan-500 text-black" : "bg-gray-700 text-gray-100"}`}>
+                {m.content}
+              </div>
             </div>
           );
         })}
       </div>
 
-      <form onSubmit={sendMessage}>
-        <input
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Type a message..."
-          style={{ width: "75%", padding: "8px" }}
-        />
-        <button type="submit" style={{ padding: "8px 12px" }}>
-          Send
-        </button>
+      <form onSubmit={sendMessage} className="mt-3 flex gap-3">
+        <input value={content} onChange={(e) => setContent(e.target.value)} placeholder="Type a message..."
+          className="flex-1 px-3 py-2 rounded bg-gray-800 border border-gray-700" />
+        <button className="px-4 py-2 bg-cyan-500 rounded">Send</button>
       </form>
     </div>
   );

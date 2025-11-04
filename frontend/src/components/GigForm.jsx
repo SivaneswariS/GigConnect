@@ -1,3 +1,4 @@
+// components/GigForm.jsx
 import { useState } from "react";
 import API from "../services/api";
 
@@ -9,51 +10,27 @@ export default function GigForm() {
     try {
       await API.post("/gigs", form);
       alert("Gig posted!");
+      setForm({ title: "", description: "", budget: "", location: "" });
     } catch (err) {
       alert(err.response?.data?.message || "Error creating gig");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg"
-      >
-        <h2 className="text-2xl font-semibold text-center mb-6 text-blue-600">Create a Gig</h2>
-
-        <input
-          placeholder="Title"
-          className="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-        />
-
-        <textarea
-          placeholder="Description"
-          className="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
-
-        <input
-          type="number"
-          placeholder="Budget"
-          className="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          onChange={(e) => setForm({ ...form, budget: e.target.value })}
-        />
-
-        <input
-          placeholder="Location"
-          className="w-full mb-6 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          onChange={(e) => setForm({ ...form, location: e.target.value })}
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
-        >
-          Post Gig
-        </button>
+    <div className="max-w-xl mx-auto bg-gray-900 p-6 rounded-2xl border border-gray-800">
+      <h2 className="text-xl text-cyan-300 font-bold mb-4">Create a Gig</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
+          className="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700" />
+        <textarea placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+          className="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700" />
+        <input type="number" placeholder="Budget" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })}
+          className="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700" />
+        <input placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
+          className="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700" />
+        <button className="w-full bg-emerald-500 py-2 rounded">Post Gig</button>
       </form>
     </div>
   );
 }
+

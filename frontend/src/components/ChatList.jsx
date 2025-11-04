@@ -1,63 +1,41 @@
+// components/ChatList.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../services/api";
 import Chat from "./Chat";
 
-function ChatList({ currentUserId }) {
+export default function ChatList({ currentUserId }) {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const load = async () => {
       try {
-        const res = await axios.get("http://localhost:5050/api/users", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        // Filter out the logged-in user
-        setUsers(res.data.filter((u) => u._id !== currentUserId));
+        const { data } = await API.get("/users");
+        setUsers(data.filter(u => u._id !== currentUserId));
       } catch (err) {
-        console.error("Error loading users:", err);
+        console.error(err);
       }
     };
-    fetchUsers();
+    load();
   }, [currentUserId]);
 
   return (
-    <div style={{ display: "flex", gap: "2rem" }}>
-      {/* Sidebar */}
-      <div style={{ width: "200px", borderRight: "1px solid #ccc" }}>
-        <h3>Users</h3>
-        {users.map((u) => (
-          <div
-            key={u._id}
-            style={{
-              cursor: "pointer",
-              background: selectedUser?._id === u._id ? "#ddd" : "transparent",
-              padding: "8px",
-              borderRadius: "6px",
-            }}
-            onClick={() => setSelectedUser(u)}
-          >
-            {u.name}
-          </div>
-        ))}
-      </div>
+    <div className="flex gap-6">
+      <aside className="w-64 bg-gray-900 p-4 rounded border border-gray-800">
+        <h4 className="text-cyan-300 font-bold mb-3">Users</h4>
+        <div className="space-y-2">
+          {users.map(u => (
+            <button key={u._id} onClick={() => setSelectedUser(u)} className={`w-full text-left p-2 rounded ${selectedUser?._id === u._id ? "bg-gray-800" : "hover:bg-gray-800"}`}>
+              {u.name}
+            </button>
+          ))}
+        </div>
+      </aside>
 
-      {/* Chat window */}
-      <div style={{ flex: 1 }}>
-        {selectedUser ? (
-          <Chat
-            currentUserId={currentUserId}
-            receiverId={selectedUser._id}
-          />
-        ) : (
-          <p>Select a user to chat with.</p>
-        )}
+      <div className="flex-1">
+        {selectedUser ? <Chat currentUserId={currentUserId} receiverId={selectedUser._id} /> : <p>Select a user</p>}
       </div>
     </div>
   );
 }
 
-export default ChatList;

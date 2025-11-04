@@ -1,3 +1,4 @@
+// components/Profile.jsx
 import { useEffect, useState } from "react";
 import API from "../services/api";
 
@@ -6,7 +7,6 @@ export default function Profile() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch user info
   const fetchUser = async () => {
     try {
       const { data } = await API.get("/users/me");
@@ -20,21 +20,15 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  // Handle image upload
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return alert("Please choose an image first!");
-
-    const formData = new FormData();
-    formData.append("image", file);
-
+    if (!file) return alert("Pick an image");
+    const fd = new FormData();
+    fd.append("image", file);
     try {
       setLoading(true);
-      const { data } = await API.post("/upload/profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("Profile image uploaded successfully!");
-      setUser((prev) => ({ ...prev, profileImage: data.imageUrl }));
+      const { data } = await API.post("/upload/profile", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      setUser((p) => ({ ...p, profileImage: data.imageUrl }));
     } catch (err) {
       alert(err.response?.data?.message || "Upload failed");
     } finally {
@@ -42,52 +36,26 @@ export default function Profile() {
     }
   };
 
-  if (!user)
-    return (
-      <div className="flex justify-center items-center min-h-screen text-gray-500 text-lg">
-        Loading...
-      </div>
-    );
+  if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md text-center">
-        {/* Profile Image */}
-        <div className="flex flex-col items-center mb-6">
-          <img
-            src={
-              user.profileImage ||
-              "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-            }
-            alt="Profile"
-            className="w-28 h-28 rounded-full object-cover mb-3 border-4 border-blue-200"
-          />
+    <div className="max-w-md mx-auto bg-gray-900 p-6 rounded-2xl border border-gray-800">
+      <div className="flex flex-col items-center">
+        <img src={user.profileImage || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+          alt="profile" className="w-28 h-28 rounded-full mb-4 object-cover border-4 border-cyan-400" />
+        <h2 className="text-2xl font-bold text-cyan-300">{user.name}</h2>
+        <p className="text-gray-300">{user.email}</p>
+        <p className="text-gray-400 mt-2">Role: {user.role}</p>
 
-          <form onSubmit={handleUpload} className="flex flex-col items-center">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files[0])}
-              className="text-sm text-gray-600 mb-2"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              {loading ? "Uploading..." : "Upload Image"}
-            </button>
-          </form>
-        </div>
-
-        {/* User Details */}
-        <h2 className="text-2xl font-semibold mb-4 text-blue-600">
-          {user.name}
-        </h2>
-        <p className="text-gray-600 mb-2">Role: {user.role}</p>
-        <p className="text-gray-600">Email: {user.email}</p>
+        <form onSubmit={handleUpload} className="mt-4 w-full flex flex-col items-center gap-3">
+          <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} className="text-sm text-gray-400" />
+          <button disabled={loading} className="px-4 py-2 bg-cyan-500 rounded">
+            {loading ? "Uploading..." : "Upload Image"}
+          </button>
+        </form>
       </div>
     </div>
   );
 }
+
 
