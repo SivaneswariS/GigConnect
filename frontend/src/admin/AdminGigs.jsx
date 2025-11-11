@@ -21,18 +21,18 @@ export default function AdminGigs() {
   }, []);
 
   return (
-    <div>
+    <div className="text-black">
       <h2 className="text-xl font-bold mb-4">🛠 Manage Gigs</h2>
 
       <div className="grid gap-4">
         {gigs.map((g) => (
-          <div key={g._id} className="p-4 bg-white shadow rounded">
+          <div key={g._id} className="p-4 bg-white shadow rounded border">
             <h3 className="text-lg font-semibold">{g.title}</h3>
             <p>{g.description}</p>
             <p className="text-sm mt-1">Client: {g.client?.name}</p>
 
             <button
-              className="mt-2 text-red-500"
+              className="mt-2 text-red-500 font-semibold"
               onClick={() => deleteGig(g._id)}
             >
               Delete Gig

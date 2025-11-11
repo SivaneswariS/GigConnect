@@ -21,27 +21,28 @@ export default function AdminUsers() {
   }, []);
 
   return (
-    <div>
+    <div className="text-black">
       <h2 className="text-xl font-bold mb-4">👥 Users</h2>
 
-      <table className="w-full bg-white shadow rounded">
+      <table className="w-full bg-white shadow rounded border">
         <thead>
-          <tr className="bg-gray-200">
+          <tr className="bg-gray-200 text-black">
             <th className="p-2">Name</th>
             <th className="p-2">Email</th>
             <th className="p-2">Role</th>
             <th className="p-2">Action</th>
           </tr>
         </thead>
+
         <tbody>
           {users.map((u) => (
-            <tr key={u._id} className="border-b">
+            <tr key={u._id} className="border-b text-black">
               <td className="p-2">{u.name}</td>
               <td className="p-2">{u.email}</td>
               <td className="p-2">{u.role}</td>
               <td className="p-2">
                 <button
-                  className="text-red-500"
+                  className="text-red-500 font-semibold"
                   onClick={() => deleteUser(u._id)}
                 >
                   Delete
@@ -54,3 +55,4 @@ export default function AdminUsers() {
     </div>
   );
 }
+

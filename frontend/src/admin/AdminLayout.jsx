@@ -3,7 +3,8 @@ import { Link, Outlet } from "react-router-dom";
 export default function AdminLayout() {
   return (
     <div className="flex h-screen">
-      {/* ✅ Sidebar */}
+
+      {/* Sidebar */}
       <aside className="w-64 bg-gray-900 text-white p-5">
         <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
 
@@ -17,6 +18,7 @@ export default function AdminLayout() {
           <Link to="/admin/gigs" className="block hover:text-blue-400">
             🛠 Gigs
           </Link>
+
           <button
             className="mt-5 text-red-400 hover:text-red-600"
             onClick={() => {
@@ -29,10 +31,11 @@ export default function AdminLayout() {
         </nav>
       </aside>
 
-      {/* ✅ Main content */}
-      <main className="flex-1 p-6 overflow-y-auto bg-gray-100">
+      {/* Main Content (Light Mode) */}
+      <main className="flex-1 p-6 overflow-y-auto bg-gray-100 text-black">
         <Outlet />
       </main>
     </div>
   );
 }
+
