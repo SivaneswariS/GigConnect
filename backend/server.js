@@ -18,14 +18,17 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS (deploy ready)
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "https://gig-connect-rho.vercel.app"   // ✅ your Vercel frontend
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 
@@ -47,12 +50,16 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "https://gig-connect-rho.vercel.app"
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
   transports: ["websocket", "polling"],
 });
+
 
 const onlineUsers = new Map();
 
