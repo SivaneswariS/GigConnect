@@ -11,8 +11,6 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-
-// ✅ FIXED — Import CommonJS export properly
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
@@ -20,15 +18,16 @@ connectDB();
 
 const app = express();
 
-// ✅ Middleware
-app.use(express.json());
+// ✅ CORS (deploy ready)
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
+app.use(express.json());
 
 // ✅ Routes
 app.use("/api/users", userRoutes);
@@ -41,14 +40,14 @@ app.use("/api/payments", paymentRoutes);
 // ✅ Admin routes
 app.use("/api/admin", adminRoutes);
 
-app.get("/", (req, res) => res.send("API is running..."));
+app.get("/", (req, res) => res.send("API is running... ✅"));
 
-// ✅ Create HTTP + Socket.IO server
+// ✅ HTTP + Socket.IO
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -57,17 +56,18 @@ const io = new Server(server, {
 
 const onlineUsers = new Map();
 
+// ✅ Socket events
 io.on("connection", (socket) => {
   console.log("🟢 User connected:", socket.id);
 
   socket.on("join", (userId) => {
     socket.join(userId);
     onlineUsers.set(userId, socket.id);
-    console.log(`User ${userId} joined room ${socket.id}`);
+    console.log(`✅ User ${userId} joined room.`);
   });
 
   socket.on("sendMessage", ({ senderId, receiverId, content }) => {
-    console.log(`Message from ${senderId} to ${receiverId}: ${content}`);
+    console.log(`📩 ${senderId} → ${receiverId}: ${content}`);
     io.to(receiverId).emit("receiveMessage", { senderId, receiverId, content });
   });
 
@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
   });
 });
 
-console.log("🟢 Socket.IO server initialized");
+console.log("✅ Socket.IO server running");
 
 const PORT = process.env.PORT || 5050;
 server.listen(PORT, () =>

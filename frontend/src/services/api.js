@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5050/api", // your backend
+  baseURL: "https://gigconnect-auzq.onrender.com", // your backend
   withCredentials: true,
 });
 
