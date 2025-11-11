@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://gigconnect-auzq.onrender.com", // your backend
+  baseURL: "https://gigconnect-auzq.onrender.com/api", // ✅ Add /api
   withCredentials: true,
 });
 
-// Add JWT to headers automatically
+// ✅ Auto attach JWT
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) req.headers.Authorization = `Bearer ${token}`;
