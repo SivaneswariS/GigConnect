@@ -31,7 +31,7 @@ export default function AdminLayout() {
         </nav>
       </aside>
 
-      {/* Main Content (Light Mode) */}
+     
       <main className="flex-1 p-6 overflow-y-auto bg-gray-100 text-black">
         <Outlet />
       </main>

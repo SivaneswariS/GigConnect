@@ -1,6 +1,6 @@
 import Message from "../models/Message.js";
 
-// ✅ Send a message (normal HTTP for backup)
+
 export const sendMessage = async (req, res) => {
   try {
     const { receiverId, content } = req.body;
@@ -17,7 +17,7 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-// ✅ Get all messages between two users
+//  Get all messages between two users
 export const getMessages = async (req, res) => {
   try {
     const { userId } = req.params;

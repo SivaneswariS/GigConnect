@@ -1,4 +1,4 @@
-// components/ChatList.jsx
+
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import Chat from "./Chat";

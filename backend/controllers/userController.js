@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 
-// ✅ Register User
+//  Register User
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// ✅ Login User (Admin + Client + Freelancer)
+//  Login User (Admin + Client + Freelancer)
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -76,7 +76,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ✅ Get Logged-in User Info
+//  Get Logged-in User Info
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");

@@ -1,4 +1,4 @@
-// components/ReviewSection.jsx
+
 import { useEffect, useState } from "react";
 import API from "../services/api";
 
@@ -12,7 +12,7 @@ export default function ReviewSection({ gigId, onReviewAdded }) {
     try {
       const { data } = await API.get(`/reviews/${gigId}`);
       setReviews(data || []);
-      onReviewAdded?.(data); // ✅ notify GigFeed
+      onReviewAdded?.(data); //  notify GigFeed
     } catch (err) {
       console.error(err);
     }

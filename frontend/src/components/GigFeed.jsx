@@ -1,4 +1,4 @@
-// components/GigFeed.jsx
+
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import ReviewSection from "./ReviewSection";
@@ -37,7 +37,7 @@ export default function GigFeed() {
   return (
     <div className="min-h-screen text-white">
 
-      {/* ✅✅ SEARCH + FILTER UI RESTORED */}
+      {/* SEARCH + FILTER UI  */}
       <form
         onSubmit={(e) => {
           e.preventDefault();

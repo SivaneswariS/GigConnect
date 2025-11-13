@@ -1,6 +1,6 @@
 import Gig from "../models/Gig.js";
 
-// ✅ Create a new gig (Client only)
+//  Create a new gig (Client only)
 export const createGig = async (req, res) => {
   try {
     if (req.user.role !== "Client") {
@@ -25,7 +25,7 @@ export const createGig = async (req, res) => {
   }
 };
 
-// ✅ Get all gigs (with search + filter)
+//  Get all gigs (with search + filter)
 export const getAllGigs = async (req, res) => {
   try {
     const { search, minBudget, maxBudget, category, skill, location } = req.query;
@@ -56,7 +56,7 @@ export const getAllGigs = async (req, res) => {
   }
 };
 
-// ✅ Update a gig (only owner)
+//  Update a gig (only owner)
 export const updateGig = async (req, res) => {
   try {
     const gig = await Gig.findById(req.params.id);
@@ -75,7 +75,7 @@ export const updateGig = async (req, res) => {
   }
 };
 
-// ✅ Delete a gig
+//  Delete a gig
 export const deleteGig = async (req, res) => {
   try {
     const gig = await Gig.findById(req.params.id);

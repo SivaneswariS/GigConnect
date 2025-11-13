@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
-    // 🟢 NEW FIELD for Cloudinary image
+    //  NEW FIELD for Cloudinary image
     profileImage: {
       type: String, // Cloudinary image URL
       default: "",  // will be filled after upload

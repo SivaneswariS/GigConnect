@@ -1,7 +1,7 @@
 import Review from "../models/Review.js";
 import Gig from "../models/Gig.js";
 
-// ➕ Add new review
+//  Add new review
 export const addReview = async (req, res) => {
   try {
     const { gigId, rating, comment } = req.body;
@@ -29,7 +29,7 @@ export const addReview = async (req, res) => {
   }
 };
 
-// 📋 Get all reviews for a gig
+//  Get all reviews for a gig
 export const getGigReviews = async (req, res) => {
   try {
     const { gigId } = req.params;

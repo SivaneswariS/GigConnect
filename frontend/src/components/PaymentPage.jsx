@@ -1,4 +1,4 @@
-// components/PaymentPage.jsx
+
 import { useState } from "react";
 import API from "../services/api";
 import { useParams } from "react-router-dom";
