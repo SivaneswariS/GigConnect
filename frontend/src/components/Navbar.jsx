@@ -1,17 +1,17 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getUserFromToken } from "../utils/token";
 
-export default function Navbar({ setIsLoggedIn }) {
+export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  // ✅ When login state changes, recheck the token
   useEffect(() => {
     const token = localStorage.getItem("token");
     const u = getUserFromToken(token);
     setUser(u);
-  }, []);
+  }, [isLoggedIn]); // <-- watch isLoggedIn here
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -27,8 +27,12 @@ export default function Navbar({ setIsLoggedIn }) {
         </Link>
 
         <nav className="flex items-center gap-3 ml-6">
-          <Link className="px-3 py-2 rounded-md hover:bg-gray-800" to="/gigs">Gigs</Link>
-          <Link className="px-3 py-2 rounded-md hover:bg-gray-800" to="/chats">Chats</Link>
+          {user && (
+            <>
+              <Link className="px-3 py-2 rounded-md hover:bg-gray-800" to="/gigs">Gigs</Link>
+              <Link className="px-3 py-2 rounded-md hover:bg-gray-800" to="/chats">Chats</Link>
+            </>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-3">

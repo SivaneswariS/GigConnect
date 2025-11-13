@@ -47,7 +47,8 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-black text-gray-100">
-        <Navbar setIsLoggedIn={setIsLoggedIn} />
+       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+
         <main className="max-w-6xl mx-auto p-6">
           <Routes>
             <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
