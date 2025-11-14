@@ -1,21 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { getUserFromToken } from "../utils/token";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
-export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
+export default function Navbar() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  // ✅ When login state changes, recheck the token
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const u = getUserFromToken(token);
-    setUser(u);
-  }, [isLoggedIn]); // <-- watch isLoggedIn here
+  const { user, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    logout();
     navigate("/");
   };
 

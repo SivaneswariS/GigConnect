@@ -1,8 +1,9 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import socket from "./services/socket";
-import { getUserFromToken } from "./utils/token";
+import { useEffect } from "react";
+
+import AuthProvider from "./context/AuthContext";
+import { AuthContext } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
 import Login from "./components/Login";
@@ -26,52 +27,48 @@ function ProtectedRoute({ children }) {
   return token ? children : <Navigate to="/" replace />;
 }
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+export default function App() {
 
   useEffect(() => {
     socket.on("connect", () => {
       console.log("✅ Socket connected", socket.id);
     });
-    socket.on("disconnect", (r) => console.log("❌ Socket disconnected", r));
+    socket.on("disconnect", (reason) => console.log("❌ Socket disconnected", reason));
+
     return () => {
       socket.off("connect");
       socket.off("disconnect");
     };
   }, []);
 
-  const token = localStorage.getItem("token");
-  const userObj = getUserFromToken(token);
-  const currentUserId = userObj?.id || null;
-
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-black text-gray-100">
-       <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-black text-gray-100">
+          <Navbar />
 
-        <main className="max-w-6xl mx-auto p-6">
-          <Routes>
-            <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+          <main className="max-w-6xl mx-auto p-6">
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/post-gig" element={<ProtectedRoute><GigForm /></ProtectedRoute>} />
-            <Route path="/gigs" element={<ProtectedRoute><GigFeed /></ProtectedRoute>} />
-            <Route path="/chats" element={<ProtectedRoute><ChatList currentUserId={currentUserId} /></ProtectedRoute>} />
-            <Route path="/chat/:receiverId" element={<ProtectedRoute><Chat currentUserId={currentUserId} /></ProtectedRoute>} />
-            <Route path="/pay/:gigId" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/post-gig" element={<ProtectedRoute><GigForm /></ProtectedRoute>} />
+              <Route path="/gigs" element={<ProtectedRoute><GigFeed /></ProtectedRoute>} />
+              <Route path="/chats" element={<ProtectedRoute><ChatList /></ProtectedRoute>} />
+              <Route path="/chat/:receiverId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="/pay/:gigId" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
 
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={<AdminProtected><AdminLayout /></AdminProtected>}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="gigs" element={<AdminGigs />} />
-            </Route>
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/*" element={<AdminProtected><AdminLayout /></AdminProtected>}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="gigs" element={<AdminGigs />} />
+              </Route>
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
