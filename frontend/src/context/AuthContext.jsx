@@ -18,12 +18,7 @@ export default function AuthProvider({ children }) {
 
   const login = (data) => {
     localStorage.setItem("token", data.token);
-    setUser({
-      _id: data._id,
-      name: data.name,
-      email: data.email,
-      role: data.role,
-    });
+    setUser(data.user); // 🔥 update navbar instantly
   };
 
   const logout = () => {
