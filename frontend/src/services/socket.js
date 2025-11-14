@@ -5,7 +5,7 @@ const socket = io("https://gigconnect-auzq.onrender.com", {
   withCredentials: true,
   reconnection: true,
   reconnectionAttempts: 5,
-  timeout: 10000, // 10 seconds
+  timeout: 30000, 
 });
 
 socket.on("connect_error", (err) => {
