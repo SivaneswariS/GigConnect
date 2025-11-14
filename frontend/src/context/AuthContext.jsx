@@ -18,7 +18,7 @@ export default function AuthProvider({ children }) {
 
   const login = (data) => {
     localStorage.setItem("token", data.token);
-    setUser(data); // 🔥 update navbar instantly
+    setUser(data.user); // 🔥 update navbar instantly
   };
 
   const logout = () => {
